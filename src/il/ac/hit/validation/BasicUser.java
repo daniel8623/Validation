@@ -7,12 +7,23 @@ public class BasicUser extends User {
 
     /**
      * Constructs a BasicUser.
-     * * @param username the username
+     *
+     * @param username the username
      * @param email    the email
      * @param password the password
      * @param age      the age
      */
     public BasicUser(String username, String email, String password, int age) {
         super(username, email, password, age);
+        // Passes the initialization parameters to the parent User class
+    }
+
+    @Override
+    public String toString() {
+        return "BasicUser{" +
+                "username='" + getUsername() + '\'' +
+                ", email='" + getEmail() + '\'' +
+                ", age=" + getAge() +
+                '}';
     }
 }

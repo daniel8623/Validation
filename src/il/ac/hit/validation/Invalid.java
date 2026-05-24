@@ -21,10 +21,12 @@ public class Invalid implements ValidationResult {
             throw new IllegalArgumentException("Reason cannot be null");
         }
         this.reason = reason;
+        // The reason is successfully assigned to the instance variable
     }
 
     @Override
     public boolean isValid() {
+        // Always returns false for an invalid result
         return false;
     }
 
@@ -32,5 +34,10 @@ public class Invalid implements ValidationResult {
     public Optional<String> getReason() {
         // Packaging the reason safely in an Optional wrapper
         return Optional.of(reason);
+    }
+
+    @Override
+    public String toString() {
+        return "Invalid{reason='" + reason + "'}";
     }
 }

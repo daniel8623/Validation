@@ -1,5 +1,6 @@
 package il.ac.hit.validation;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -19,6 +20,7 @@ public interface UserValidation extends Function<User, ValidationResult> {
      * @return a combined UserValidation
      */
     default UserValidation and(UserValidation other) {
+        Objects.requireNonNull(other, "Validation condition cannot be null");
         return user -> {
             // Evaluates the current condition first
             var result = this.apply(user);
@@ -35,6 +37,7 @@ public interface UserValidation extends Function<User, ValidationResult> {
      * @return a combined UserValidation
      */
     default UserValidation or(UserValidation other) {
+        Objects.requireNonNull(other, "Validation condition cannot be null");
         return user -> {
             var result = this.apply(user);
 
@@ -53,6 +56,7 @@ public interface UserValidation extends Function<User, ValidationResult> {
      * @return a combined UserValidation
      */
     default UserValidation xor(UserValidation other) {
+        Objects.requireNonNull(other, "Validation condition cannot be null");
         return user -> {
             // Applying both validations to check their states
             var res1 = this.apply(user);
@@ -62,7 +66,9 @@ public interface UserValidation extends Function<User, ValidationResult> {
             if (res1.isValid() ^ res2.isValid()) {
                 return new Valid();
             } else {
-                return new Invalid("XOR condition failed: strictly one condition must be valid");
+                // Providing a detailed explanation of why the XOR failed
+                String state = res1.isValid() ? "valid" : "invalid";
+                return new Invalid("XOR condition failed: strictly one condition must be valid (Both were " + state + ")");
             }
         };
     }
@@ -78,9 +84,11 @@ public interface UserValidation extends Function<User, ValidationResult> {
      * @return a combined UserValidation
      */
     static UserValidation all(UserValidation... validations) {
+        Objects.requireNonNull(validations, "Validations array cannot be null");
         return user -> {
             // Iterating over all provided rules
             for (var validation : validations) {
+                if (validation == null) continue; // Skip null entries safely
                 var result = validation.apply(user);
 
                 // Halts at the first failure encountered
@@ -99,9 +107,11 @@ public interface UserValidation extends Function<User, ValidationResult> {
      * @return a combined UserValidation
      */
     static UserValidation none(UserValidation... validations) {
+        Objects.requireNonNull(validations, "Validations array cannot be null");
         return user -> {
             // Iterating to ensure all conditions strictly fail
             for (var validation : validations) {
+                if (validation == null) continue;
                 var result = validation.apply(user);
                 if (result.isValid()) {
                     return new Invalid("NONE condition failed: at least one validation passed");
